@@ -96,6 +96,14 @@ func log_loggly(str string, req *http.Request, log_level LogLevel){
 //the dynamodb pay-me-money units if the table is large.  It p a g e s it
 //will actually send it all
 func allHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		log_loggly("Incorrect method sent to web server :: 405", r, Error)
+		return
+	}
+
 	ctx := context.Background()
 	p := dynamodb.NewScanPaginator(client, &dynamodb.ScanInput{
 		TableName: aws.String("mmorabi2_EveOrderTable"),
@@ -124,6 +132,7 @@ func allHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		log_loggly("Incorrect method sent to web server :: 405", r, Error)
